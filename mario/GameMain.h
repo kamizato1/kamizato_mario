@@ -10,7 +10,6 @@ class GameMain : public AbstractScene
 {
 private:
 
-    Key* key;
     Stage* stage;
     Player* player;
 

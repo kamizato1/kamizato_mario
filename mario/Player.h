@@ -12,7 +12,7 @@ class Player : public BoxCollider
 private:
 
     int image[6][9];
-    DATA speed_data[SPEED_DATA_NUM];
+    //DATA speed_data[SPEED_DATA_NUM];
     DATA speed;
     int image_change_time;
     int image_type;

@@ -3,7 +3,8 @@
 
 struct KEY
 {
-	bool flg;
+	bool now;
+	bool old;
 };
 
 struct STICK_ANGLE
@@ -15,10 +16,7 @@ class Key //キーの更新処理
 {
 private:
 
-	int a;
-
-	KEY now_key[KEY_NUM];
-	KEY old_key[KEY_NUM];
+	KEY key_flg[KEY_NUM];
 
 	STICK_ANGLE l_stick_angle;
 	STICK_ANGLE r_stick_angle;

@@ -107,6 +107,11 @@ void Stage::BreakBlock(BoxCollider* bc)
 					stageblock[i][j]->ChangeBlockImage(block_image[15]);
 					stageblock[i][j]->ChangeBlockType(BLOCK_TYPE::NORMAL);
 				}
+				else if (stageblock[i][j]->GetBlockType() == BLOCK_TYPE::BRICK)
+				{
+					stageblock[i][j]->ChangeBlockImage(block_image[0]);
+					stageblock[i][j]->ChangeBlockType(BLOCK_TYPE::NONE);
+				}
 				//else if()
 			}
 		}

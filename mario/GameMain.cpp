@@ -4,29 +4,24 @@
 GameMain::GameMain()
 {
     stage = new Stage();
-    key = new Key();
     player = new Player();
-
     stop = FALSE;
 }
 
 GameMain::~GameMain()
 {
     delete stage;
-    delete key;
     delete player;
 }
 
 void GameMain::Update(Key* key)
 {
-    key->Update();
-
     if (!stop)
     {
         player->Update(key, stage);
         stage->Update();
     }
-    if(key->KeyPressed(A))stop = !stop;
+    if(key->KeyDown(A))stop = !stop;
 }
 
 void GameMain::Draw() const

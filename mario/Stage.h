@@ -5,10 +5,19 @@
 #include"define.h"
 #include"Item.h"
 
+#define BACK_GROUND_NUM 110
+#define STAGE_BLOCK_NUM 653
+
 struct PLAYER_HIT_STAGE
 {
-    int y, x;
+    int block_num;
     bool flg;
+};
+
+struct BACK_GROUND
+{
+    DATA location;
+    int image;
 };
 
 class Stage
@@ -16,10 +25,13 @@ class Stage
 private:
 
     class Item* item;
-    class StageBlock* stageblock[STAGE_BLOCK_NUM_Y][STAGE_BLOCK_NUM_X];
+    class StageBlock* stageblock[STAGE_BLOCK_NUM];
     
     int hatena_block_image_type;
     int hatena_block_image_change_time;
+
+    int sky_image;
+    BACK_GROUND back_ground[BACK_GROUND_NUM];
 
 public:
 
@@ -31,9 +43,12 @@ public:
     //•`‰æ‚ÉŠÖ‚·‚é‚±‚Æ‚ðŽÀ‘•‚·‚é
     void Draw(float camera_work) const;
 
+    void DrawBackGround(float camera_work) const;
+    void DrawStage(float camera_work) const;
+
     bool HitStage(BoxCollider* bc);
 
     PLAYER_HIT_STAGE PlayerHitStage(BoxCollider* bc);
-    void BreakBlock(PLAYER_HIT_STAGE phs);
+    void BreakBlock(PLAYER_HIT_STAGE player_hit_stage);
 
 };

@@ -6,19 +6,39 @@
 
 Stage::Stage()
 {
+	int block_image[BLOCK_TYPE_NUM];
+	LoadDivGraph("image/stage_block_2.png", BLOCK_TYPE_NUM, BLOCK_TYPE_NUM, 1, STAGE_BLOCK_SIZE_X, STAGE_BLOCK_SIZE_Y, block_image);
+	sky_image = LoadGraph("image/sky.png");
+	for (int i = 0; i < STAGE_BLOCK_NUM; i++)stageblock[i] = nullptr;
 	
 	FILE* fp;//ステージ１ファイル読み込み
 	fopen_s(&fp, "data/stage01.txt", "r");
+
+	int back_ground_count = 0;
+	int stage_block_count = 0;
 
 	for (int i = 0; i < STAGE_BLOCK_NUM_Y; i++)
 	{
 		for (int j = 0; j < STAGE_BLOCK_NUM_X; j++)
 		{
-
 			int type;
 			fscanf_s(fp, "%d", &type);
 
-			stageblock[i][j] = new StageBlock(j, i, type);
+			if (type <= 11)
+			{
+				if (back_ground_count < BACK_GROUND_NUM && type > 0)
+				{
+					back_ground[back_ground_count].location.x = (j * STAGE_BLOCK_SIZE_X);
+					back_ground[back_ground_count].location.y = (i * STAGE_BLOCK_SIZE_Y);
+					back_ground[back_ground_count].image = block_image[type];
+					back_ground_count++;
+				}
+			}
+			else if(stage_block_count < STAGE_BLOCK_NUM)
+			{
+				stageblock[stage_block_count] = new StageBlock(j, i, type);
+				stage_block_count++;
+			}
 		}
 	}
 	fclose(fp);
@@ -31,15 +51,10 @@ Stage::Stage()
 
 Stage::~Stage()
 {
-	for (int i = 0; i < STAGE_BLOCK_NUM_Y; i++)
+	for (int i = 0; i < STAGE_BLOCK_NUM; i++)
 	{
-		for (int j = 0; j < STAGE_BLOCK_NUM_X; j++)
-		{
-			delete  stageblock[i][j];
-		}
-
+		delete  stageblock[i];
 	}
-	
 	delete item;
 }
 
@@ -49,16 +64,17 @@ void Stage::Update()
 	{
 		if (++hatena_block_image_type > HATENA_BLOCK_IMAGE_LAST)hatena_block_image_type = HATENA_BLOCK_IMAGE_FIRST;
 
-		for (int i = 0; i < STAGE_BLOCK_NUM_Y; i++)
+		for (int i = 0; i < STAGE_BLOCK_NUM; i++)
 		{
-			for (int j = 0; j < STAGE_BLOCK_NUM_X; j++)
+			if (stageblock[i] != nullptr)
 			{
-				if (stageblock[i][j]->GetBlockType() == BLOCK_TYPE::HATENA)
+				if (stageblock[i]->GetBlockType() == BLOCK_TYPE::HATENA)
 				{
-					stageblock[i][j]->SetBlockImageType(hatena_block_image_type);
+					stageblock[i]->SetBlockImageType(hatena_block_image_type);
 				}
 			}
 		}
+
 
 		if (hatena_block_image_type == HATENA_BLOCK_IMAGE_FIRST)hatena_block_image_change_time = HATENA_BLOCK_IMAGE_CHANGE_TIME * 3;
 		else hatena_block_image_change_time = HATENA_BLOCK_IMAGE_CHANGE_TIME;
@@ -69,71 +85,66 @@ void Stage::Update()
 
 void Stage::Draw(float camera_work) const
 {
-	for (int i = 0; i < STAGE_BLOCK_NUM_Y; i++)
-	{
-		for (int j = 0; j < STAGE_BLOCK_NUM_X; j++)
-		{
-			if (stageblock[i][j]->GetBlockType() == BLOCK_TYPE::NONE)
-			{
-				stageblock[i][j]->Draw(camera_work);
-			}
-		}
-	}
-
+	DrawBackGround(camera_work);
 	if (item != nullptr)item->Draw(camera_work);
+	DrawStage(camera_work);
+}
 
-	for (int i = 0; i < STAGE_BLOCK_NUM_Y; i++)
+void Stage::DrawBackGround(float camera_work)const
+{
+	DrawGraph(0, 0, sky_image, FALSE);
+	for (int i = 0; i < BACK_GROUND_NUM; i++)
 	{
-		for (int j = 0; j < STAGE_BLOCK_NUM_X; j++)
+		DrawGraph(back_ground[i].location.x + camera_work, back_ground[i].location.y, back_ground[i].image, FALSE);
+	}
+}
+
+void Stage::DrawStage(float camera_work)const
+{
+	for (int i = 0; i < STAGE_BLOCK_NUM; i++)
+	{
+		if (stageblock[i] != nullptr)
 		{
-			if (stageblock[i][j]->GetBlockType() != BLOCK_TYPE::NONE)
-			{
-				stageblock[i][j]->Draw(camera_work);
-			}
+			stageblock[i]->Draw(camera_work);
 		}
 	}
 }
 
 PLAYER_HIT_STAGE Stage::PlayerHitStage(BoxCollider* bc)
 {
-	PLAYER_HIT_STAGE phs = {0, 0, FALSE};
+	PLAYER_HIT_STAGE player_hit_stage = {0, FALSE};
 
-	for (int i = 0; i < STAGE_BLOCK_NUM_Y; i++)
+	for (int i = 0; i < STAGE_BLOCK_NUM; i++)
 	{
-		for (int j = 0; j < STAGE_BLOCK_NUM_X; j++)
+		if (stageblock[i] != nullptr)
 		{
-			if (stageblock[i][j]->HitBox(bc))
+			if (stageblock[i]->HitBox(bc))
 			{
-				if (stageblock[i][j]->GetBlockType() != BLOCK_TYPE::NONE)
-				{
-					phs = { i, j, TRUE };
-					return phs;
-				}
+				player_hit_stage = { i, TRUE };
+				return player_hit_stage;
 			}
 		}
 	}
-	return phs;
+	return player_hit_stage;
 }
 
 bool Stage::HitStage(BoxCollider* bc)
 {
-	for (int i = 0; i < STAGE_BLOCK_NUM_Y; i++)
+	for (int i = 0; i < STAGE_BLOCK_NUM; i++)
 	{
-		for (int j = 0; j < STAGE_BLOCK_NUM_X; j++)
+		if (stageblock[i] != nullptr)
 		{
-			if (stageblock[i][j]->HitBox(bc))
-			{
-				if (stageblock[i][j]->GetBlockType() != BLOCK_TYPE::NONE)return TRUE;
-			}
+			if (stageblock[i]->HitBox(bc))return TRUE;
 		}
 	}
 	return FALSE;
 }
 
-void Stage::BreakBlock(PLAYER_HIT_STAGE phs)
+void Stage::BreakBlock(PLAYER_HIT_STAGE player_hit_stage)
 {
-	BREAK_BLOCK bb = stageblock[phs.y][phs.x]->BreakBlock();
-	if (bb.item_type != ITEM_TYPE::NONE)item = new Item(bb.item_type, bb.location);
+	BREAK_BLOCK break_block = stageblock[player_hit_stage.block_num]->BreakBlock();
+	if (break_block.can_delete)stageblock[player_hit_stage.block_num] = nullptr;
+	if (break_block.item_type != ITEM_TYPE::NONE)item = new Item(break_block.item_type, break_block.location);
 }
 
 

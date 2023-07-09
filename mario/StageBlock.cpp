@@ -43,27 +43,21 @@ void StageBlock::Draw(float camera_work) const
 
 BREAK_BLOCK StageBlock::BreakBlock()
 {
-    BREAK_BLOCK bb = { item_type, location };
+    BREAK_BLOCK break_block = { item_type, location, FALSE };
 
-    if (block_type == BLOCK_TYPE::HATENA)
+    if ((block_type == BLOCK_TYPE::HATENA) ||
+        (block_type == BLOCK_TYPE::BRICK) ||
+        (block_type == BLOCK_TYPE::TRANSPARENT_BLOCK))
     {
+        if (block_type == BLOCK_TYPE::BRICK)
+        {
+            if (item_type == ITEM_TYPE::NONE)break_block.can_delete = TRUE;
+        }
+
         block_type = BLOCK_TYPE::NORMAL;
+        item_type = ITEM_TYPE::NONE;
         block_image_type = 15;
     }
-    else if (block_type == BLOCK_TYPE::BRICK)
-    {
-        block_type = BLOCK_TYPE::NONE;
-        block_image_type = 0;
-    }
-    else if (block_type == BLOCK_TYPE::TRANSPARENT_BLOCK)
-    {
-        block_type = BLOCK_TYPE::NORMAL;
-        block_image_type = 15;
-    }
 
-    
-
-    item_type = ITEM_TYPE::NONE;
-
-    return bb;
+    return break_block;
 }

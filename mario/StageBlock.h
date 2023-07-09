@@ -23,6 +23,7 @@ struct BREAK_BLOCK
 {
     ITEM_TYPE item_type;
     DATA location;
+    bool can_delete;
 };
 
 class StageBlock : public BoxCollider

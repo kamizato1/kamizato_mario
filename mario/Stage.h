@@ -3,15 +3,21 @@
 #include"StageBlock.h"
 #include"BoxCollider.h"
 #include"define.h"
+#include"Item.h"
 
-#define BLOCK_TYPE_NUM 37
+struct PLAYER_HIT_STAGE
+{
+    int y, x;
+    bool flg;
+};
 
 class Stage
 {
 private:
 
-    StageBlock* stageblock[STAGE_BLOCK_NUM_Y][STAGE_BLOCK_NUM_X];
-    int block_image[BLOCK_TYPE_NUM];
+    class Item* item;
+    class StageBlock* stageblock[STAGE_BLOCK_NUM_Y][STAGE_BLOCK_NUM_X];
+    
     int hatena_block_image_type;
     int hatena_block_image_change_time;
 
@@ -26,5 +32,8 @@ public:
     void Draw(float camera_work) const;
 
     bool HitStage(BoxCollider* bc);
-    void BreakBlock(BoxCollider* bc);
+
+    PLAYER_HIT_STAGE PlayerHitStage(BoxCollider* bc);
+    void BreakBlock(PLAYER_HIT_STAGE phs);
+
 };

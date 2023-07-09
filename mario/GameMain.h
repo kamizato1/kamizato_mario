@@ -6,12 +6,13 @@
 #include"Key.h"
 #include"define.h"
 
+
 class GameMain : public AbstractScene
 {
 private:
 
-    Stage* stage;
-    Player* player;
+     Stage* stage;
+     Player* player;
 
     bool stop;
 
@@ -26,5 +27,4 @@ public:
     //•`‰æ‚ÉŠÖ‚·‚é‚±‚Æ‚ðŽÀ‘•‚·‚é
     void Draw() const override;
     AbstractScene* ChangeScene() override;
-
 };

@@ -31,3 +31,14 @@ struct DATA //座標,大きさ,スピードなどに使う
 {
     float x, y;
 };
+
+enum class ITEM_TYPE
+{
+    MUSHROOM,//スーパーキノコ
+    FLOUR,//ファイアーフラワー
+    STAR,
+    COIN,//コイン
+    IN_COIN, //ブロックの中のコイン
+    ONE_UP_MUSHROOM, //1UPキノコ
+    NONE,//なし
+};

@@ -2,16 +2,11 @@
 #include"Stage.h"
 
 
-
-#define HATENA_BLOCK_IMAGE_FIRST 25
-#define HATENA_BLOCK_IMAGE_LAST 28
 #define HATENA_BLOCK_IMAGE_CHANGE_TIME 6
-
 
 Stage::Stage()
 {
-	LoadDivGraph("image/stage_block_2.png", BLOCK_TYPE_NUM, BLOCK_TYPE_NUM, 1, STAGE_BLOCK_SIZE_X, STAGE_BLOCK_SIZE_Y, block_image);
-
+	
 	FILE* fp;//ステージ１ファイル読み込み
 	fopen_s(&fp, "data/stage01.txt", "r");
 
@@ -23,16 +18,15 @@ Stage::Stage()
 			int type;
 			fscanf_s(fp, "%d", &type);
 
-			int image = block_image[type];
-			if (type >= HATENA_BLOCK_IMAGE_FIRST && type <= HATENA_BLOCK_IMAGE_LAST)image = block_image[HATENA_BLOCK_IMAGE_FIRST];
-
-			stageblock[i][j] = new StageBlock(j, i, type, image);
+			stageblock[i][j] = new StageBlock(j, i, type);
 		}
 	}
 	fclose(fp);
 
 	hatena_block_image_type = HATENA_BLOCK_IMAGE_FIRST;
 	hatena_block_image_change_time = 0;
+
+	item = nullptr;
 }
 
 Stage::~Stage()
@@ -43,7 +37,10 @@ Stage::~Stage()
 		{
 			delete  stageblock[i][j];
 		}
+
 	}
+	
+	delete item;
 }
 
 void Stage::Update()
@@ -58,7 +55,7 @@ void Stage::Update()
 			{
 				if (stageblock[i][j]->GetBlockType() == BLOCK_TYPE::HATENA)
 				{
-					stageblock[i][j]->ChangeBlockImage(block_image[hatena_block_image_type]);
+					stageblock[i][j]->SetBlockImageType(hatena_block_image_type);
 				}
 			}
 		}
@@ -66,6 +63,8 @@ void Stage::Update()
 		if (hatena_block_image_type == HATENA_BLOCK_IMAGE_FIRST)hatena_block_image_change_time = HATENA_BLOCK_IMAGE_CHANGE_TIME * 3;
 		else hatena_block_image_change_time = HATENA_BLOCK_IMAGE_CHANGE_TIME;
 	}
+
+	if(item != nullptr)item->Update(this);
 }
 
 void Stage::Draw(float camera_work) const
@@ -74,9 +73,46 @@ void Stage::Draw(float camera_work) const
 	{
 		for (int j = 0; j < STAGE_BLOCK_NUM_X; j++)
 		{
-			stageblock[i][j]->Draw(camera_work);
+			if (stageblock[i][j]->GetBlockType() == BLOCK_TYPE::NONE)
+			{
+				stageblock[i][j]->Draw(camera_work);
+			}
 		}
 	}
+
+	if (item != nullptr)item->Draw(camera_work);
+
+	for (int i = 0; i < STAGE_BLOCK_NUM_Y; i++)
+	{
+		for (int j = 0; j < STAGE_BLOCK_NUM_X; j++)
+		{
+			if (stageblock[i][j]->GetBlockType() != BLOCK_TYPE::NONE)
+			{
+				stageblock[i][j]->Draw(camera_work);
+			}
+		}
+	}
+}
+
+PLAYER_HIT_STAGE Stage::PlayerHitStage(BoxCollider* bc)
+{
+	PLAYER_HIT_STAGE phs = {0, 0, FALSE};
+
+	for (int i = 0; i < STAGE_BLOCK_NUM_Y; i++)
+	{
+		for (int j = 0; j < STAGE_BLOCK_NUM_X; j++)
+		{
+			if (stageblock[i][j]->HitBox(bc))
+			{
+				if (stageblock[i][j]->GetBlockType() != BLOCK_TYPE::NONE)
+				{
+					phs = { i, j, TRUE };
+					return phs;
+				}
+			}
+		}
+	}
+	return phs;
 }
 
 bool Stage::HitStage(BoxCollider* bc)
@@ -94,26 +130,10 @@ bool Stage::HitStage(BoxCollider* bc)
 	return FALSE;
 }
 
-void Stage::BreakBlock(BoxCollider* bc)
+void Stage::BreakBlock(PLAYER_HIT_STAGE phs)
 {
-	for (int i = 0; i < STAGE_BLOCK_NUM_Y; i++)
-	{
-		for (int j = 0; j < STAGE_BLOCK_NUM_X; j++)
-		{
-			if (stageblock[i][j]->HitBox(bc))
-			{
-				if (stageblock[i][j]->GetBlockType() == BLOCK_TYPE::HATENA)
-				{
-					stageblock[i][j]->ChangeBlockImage(block_image[15]);
-					stageblock[i][j]->ChangeBlockType(BLOCK_TYPE::NORMAL);
-				}
-				else if (stageblock[i][j]->GetBlockType() == BLOCK_TYPE::BRICK)
-				{
-					stageblock[i][j]->ChangeBlockImage(block_image[0]);
-					stageblock[i][j]->ChangeBlockType(BLOCK_TYPE::NONE);
-				}
-				//else if()
-			}
-		}
-	}
+	BREAK_BLOCK bb = stageblock[phs.y][phs.x]->BreakBlock();
+	if (bb.item_type != ITEM_TYPE::NONE)item = new Item(bb.item_type, bb.location);
 }
+
+

@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="BoxCollider.cpp" />
     <ClCompile Include="GameMain.cpp" />
+    <ClCompile Include="Item.cpp" />
     <ClCompile Include="Key.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -160,6 +161,7 @@
     <ClInclude Include="BoxCollider.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="GameMain.h" />
+    <ClInclude Include="Item.h" />
     <ClInclude Include="Key.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="SceneManager.h" />

@@ -68,7 +68,6 @@ void Player::Update(Key* key, Stage* stage)
     }
     else image_type = 0;//ƒ}ƒŠƒI‚ªŽ~‚Ü‚Á‚Ä‚¢‚é‚Æ‚«
 
-
     if (sign == 1)
     {
         speed.x += ACCELERATION_SPEED;
@@ -103,43 +102,38 @@ void Player::Update(Key* key, Stage* stage)
         }
     }
 
-
-    
-
-
-
     location.x += speed.x;
 
-    if (stage->HitStage(this))//áŠQ•¨‚É“–‚½‚Á‚Ä‚¢‚é‚Æ‚«
+    if (stage->PlayerHitStage(this).flg)//áŠQ•¨‚É“–‚½‚Á‚Ä‚¢‚é‚Æ‚«
     {
         location.x = floor(location.x);
         float sign = -(speed.x / fabsf(speed.x));
-        while (stage->HitStage(this))location.x += sign;
+        while (stage->PlayerHitStage(this).flg)location.x += sign;
     }
-
 
     //yÀ•W‚ÌˆÚ“®«
 
     speed.y += GRAVITY;
     location.y += speed.y;
 
-    if (stage->HitStage(this))
+    PLAYER_HIT_STAGE phs = stage->PlayerHitStage(this);
+
+    if (phs.flg)
     {
         location.y = floor(location.y);
         float sign = -(speed.y / fabsf(speed.y));
-
+        while (stage->PlayerHitStage(this).flg)location.y += sign;
         speed.y = 0;
+
         if (sign == -1)//’n–Ê‚É‚Â‚¢‚Ä‚¢‚é‚Æ‚«
         {
-            if (key->KeyDown(B))speed.y = -13;
+            if (key->KeyDown(B))speed.y = -12;
         }
         else //“ª‚É“–‚½‚Á‚Ä‚¢‚é‚Æ‚«
         {
-            stage->BreakBlock(this);
+            stage->BreakBlock(phs);
             image_type = 6;
         }
-
-        while (stage->HitStage(this))location.y += sign;
     }
     else image_type = 6;
 }

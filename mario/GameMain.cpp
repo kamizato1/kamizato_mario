@@ -12,6 +12,7 @@ GameMain::~GameMain()
 {
     delete stage;
     delete player;
+
 }
 
 void GameMain::Update(Key* key)

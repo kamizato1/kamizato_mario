@@ -12,7 +12,7 @@
 Player::Player()
 {
 	location = { 20,20 };
-	size = { 32,64 };
+	size = { 22,60 };
 	//for (int i = 0; i < SPEED_DATA_NUM; i++)speed_data[i] = { 0,0 };
     speed = {0 , 0};
 

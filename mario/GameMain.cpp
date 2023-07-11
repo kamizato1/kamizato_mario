@@ -22,7 +22,7 @@ void GameMain::Update(Key* key)
         player->Update(key, stage);
         stage->Update();
     }
-    if(key->KeyDown(A))stop = !stop;
+    if(key->KeyDown(START))stop = !stop;
 }
 
 void GameMain::Draw() const

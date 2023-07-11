@@ -3,7 +3,7 @@
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 
-#define KEY_NUM 10
+#define KEY_NUM 11
 
 #define STAGE_BLOCK_NUM_X 250
 #define STAGE_BLOCK_NUM_Y 15
@@ -24,7 +24,8 @@ enum
     LEFT,
     RIGHT,
     LB,
-    RB
+    RB,
+    START
 };
 
 struct DATA //座標,大きさ,スピードなどに使う

@@ -23,6 +23,7 @@ void Key::Update()
 	if ((GetJoypadInputState(DX_INPUT_PAD1) & PAD_INPUT_B)) key_flg[B].now = TRUE;//Bボタンが押されているか
 	if ((GetJoypadInputState(DX_INPUT_PAD1) & PAD_INPUT_6)) key_flg[RB].now = TRUE;//Rボタンが押されているか
 	if ((GetJoypadInputState(DX_INPUT_PAD1) & PAD_INPUT_5)) key_flg[LB].now = TRUE;//Lボタンが押されているか
+	if ((GetJoypadInputState(DX_INPUT_PAD1) & PAD_INPUT_8)) key_flg[START].now = TRUE;//スタートボタンが押されているか
 
 	GetJoypadAnalogInputRight(&r_stick_angle.x, &r_stick_angle.y, DX_INPUT_PAD1); // 入力状態を取得
 	GetJoypadAnalogInput(&l_stick_angle.x, &l_stick_angle.y, DX_INPUT_PAD1); // 入力状態を取得

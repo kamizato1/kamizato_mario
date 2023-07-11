@@ -2,19 +2,20 @@
 #include"DxLib.h"
 #include"Player.h"
 
-#define MAX_SPEED 4
-#define ACCELERATION_SPEED 0.15
-
 #define IMAGE_TYPE_FIRST 3
 #define IMAGE_TYPE_LAST 4
 #define IMAGE_CHANGE_TIME 3
+
+#define PLAYER_MAX_GRAVITY 10
+#define PLAYER_GRAVITY 0.7
+#define MAX_SPEED 4
 
 Player::Player()
 {
 	location = { 20,20 };
 	size = { 22,60 };
-	//for (int i = 0; i < SPEED_DATA_NUM; i++)speed_data[i] = { 0,0 };
-    speed = {0 , 0};
+	for (int i = 0; i < SPEED_DATA_NUM; i++)speed_data[i] = { 0,0 };
+    speed = {0 , PLAYER_MAX_GRAVITY};
 
     int image[54];
     LoadDivGraph("image/Mario/big_mario.png", 54, 9, 6, 32, 64, image);
@@ -35,13 +36,16 @@ Player::Player()
 
 void Player::Update(Key* key, Stage* stage)
 {
+    if(CheckHitKey(KEY_INPUT_RETURN))location.y = 250;
+
     //x座標の移動↓
 
-   /* float add_speed_x = 0;
+    float add_speed_x = 0;
     float now_speed_x = 0;
     float old_speed_x;
-    if (key->KeyPressed(LEFT))now_speed_x = -MAX_SPEED;
-    else if (key->KeyPressed(RIGHT))now_speed_x = MAX_SPEED;
+    speed.x = 0;
+    if (key->KeyPressed(LEFT))speed.x = -MAX_SPEED;
+    else if (key->KeyPressed(RIGHT))speed.x = MAX_SPEED;
 
     for (int i = 0; i < SPEED_DATA_NUM; i++)
     {
@@ -51,56 +55,11 @@ void Player::Update(Key* key, Stage* stage)
         add_speed_x += speed_data[i].x;
     }
 
-    speed.x = (add_speed_x / SPEED_DATA_NUM);*/
+    //speed.x = (add_speed_x / SPEED_DATA_NUM);
+    if (key->KeyPressed(A))speed.x = speed.x *= 1.5; //Aボタンが押されたら歩く速さを1.5倍にする;
 
-    int sign = 0;
-    if (key->KeyPressed(RIGHT)) sign = 1;
-    else if (key->KeyPressed(LEFT)) sign = -1;
-
-    if (speed.x != 0)//マリオが歩いているとき
-    {
-        if (++image_change_time > IMAGE_CHANGE_TIME)
-        {
-            ++image_type;
-            if ((image_type < IMAGE_TYPE_FIRST) || (image_type > IMAGE_TYPE_LAST))image_type = IMAGE_TYPE_FIRST;
-            image_change_time = 0;
-        }
-    }
-    else image_type = 0;//マリオが止まっているとき
-
-    if (sign == 1)
-    {
-        speed.x += ACCELERATION_SPEED;
-        if (speed.x > MAX_SPEED)speed.x = MAX_SPEED;
-
-        if (speed.x >= 0)direction_left = FALSE;
-        else image_type = 5;
-    }
-    else
-    {
-        if (speed.x > 0)
-        {
-            speed.x -= ACCELERATION_SPEED;
-            if (speed.x < 0)speed.x = 0;
-        }
-    }
-
-    if (sign == -1)
-    {
-        speed.x -= ACCELERATION_SPEED;
-        if (speed.x < -MAX_SPEED)speed.x = -MAX_SPEED;
-
-        if (speed.x <= 0)direction_left = TRUE;
-        else image_type = 5;
-    }
-    else
-    {
-        if (speed.x < 0)
-        {
-            speed.x += ACCELERATION_SPEED;
-            if (speed.x > 0)speed.x = 0;
-        }
-    }
+    if (speed.x > 0)direction_left = FALSE;
+    else if (speed.x < 0)direction_left = TRUE;
 
     location.x += speed.x;
 
@@ -113,29 +72,44 @@ void Player::Update(Key* key, Stage* stage)
 
     //y座標の移動↓
 
-    speed.y += GRAVITY;
+    if(speed.y != PLAYER_MAX_GRAVITY)
+    {
+        speed.y += PLAYER_GRAVITY;
+        if (speed.y > PLAYER_MAX_GRAVITY)speed.y = PLAYER_MAX_GRAVITY;
+    }
     location.y += speed.y;
 
-    PLAYER_HIT_STAGE phs = stage->PlayerHitStage(this);
+    PLAYER_HIT_STAGE player_hit_stage = stage->PlayerHitStage(this);
 
-    if (phs.flg)
+    if (player_hit_stage.flg)//マリオがブロックに当たっている
     {
         location.y = floor(location.y);
         float sign = -(speed.y / fabsf(speed.y));
         while (stage->PlayerHitStage(this).flg)location.y += sign;
         speed.y = 0;
 
-        if (sign == -1)//地面についているとき
+        if (sign == -1)//地面に当たっている
         {
-            if (key->KeyDown(B))speed.y = -12;
+            if (key->KeyDown(B))speed.y = -14, image_type = 6;
+            else
+            {
+                if (speed.x == 0)image_type = 0;//マリオが止まっているとき
+                else //マリオが歩いているとき
+                {
+                    if (++image_change_time > IMAGE_CHANGE_TIME)
+                    {
+                        ++image_type;
+                        if ((image_type < IMAGE_TYPE_FIRST) || (image_type > IMAGE_TYPE_LAST))image_type = IMAGE_TYPE_FIRST;
+                        image_change_time = 0;
+                    }
+                }
+            }
         }
         else //頭に当たっているとき
         {
-            stage->BreakBlock(phs);
-            image_type = 6;
+            stage->BreakBlock(player_hit_stage.block_num);
         }
     }
-    else image_type = 6;
 }
 
 void Player::Draw(float camera_work) const

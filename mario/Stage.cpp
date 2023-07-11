@@ -140,10 +140,10 @@ bool Stage::HitStage(BoxCollider* bc)
 	return FALSE;
 }
 
-void Stage::BreakBlock(PLAYER_HIT_STAGE player_hit_stage)
+void Stage::BreakBlock(int block_num)
 {
-	BREAK_BLOCK break_block = stageblock[player_hit_stage.block_num]->BreakBlock();
-	if (break_block.can_delete)stageblock[player_hit_stage.block_num] = nullptr;
+	BREAK_BLOCK break_block = stageblock[block_num]->BreakBlock();
+	if (break_block.can_delete)stageblock[block_num] = nullptr;
 	if (break_block.item_type != ITEM_TYPE::NONE)item = new Item(break_block.item_type, break_block.location);
 }
 

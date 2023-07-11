@@ -49,6 +49,6 @@ public:
     bool HitStage(BoxCollider* bc);
 
     PLAYER_HIT_STAGE PlayerHitStage(BoxCollider* bc);
-    void BreakBlock(PLAYER_HIT_STAGE player_hit_stage);
+    void BreakBlock(int block_num);
 
 };

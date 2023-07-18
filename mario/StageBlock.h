@@ -3,6 +3,7 @@
 #include"BoxCollider.h"
 #include"define.h"
 #include"Item.h"
+#include"Stage.h"
 
 #define BLOCK_TYPE_NUM 37
 #define HATENA_BLOCK_IMAGE_FIRST 25
@@ -10,7 +11,6 @@
 
 enum class BLOCK_TYPE
 {
-    NONE, // なし
     NORMAL, //ブロック
     HATENA,
     BRICK,
@@ -19,20 +19,15 @@ enum class BLOCK_TYPE
     TRANSPARENT_BLOCK //透明ブロック
 };
 
-struct BREAK_BLOCK
-{
-    ITEM_TYPE item_type;
-    DATA location;
-    bool can_delete;
-};
-
 class StageBlock : public BoxCollider
 {
 private:
 
     int block_image[BLOCK_TYPE_NUM];
     int block_image_type;
-
+    bool animation;
+    float old_location_y;
+    float speed_y;
     BLOCK_TYPE block_type;
     ITEM_TYPE item_type;
 
@@ -41,7 +36,7 @@ public:
     StageBlock(int x, int y, int type);
 
     //描画以外の更新を実装する
-    void Update();
+    void Update(class Stage* stage);
     //描画に関することを実装する
     void Draw(float camera_work) const;
 
@@ -51,5 +46,5 @@ public:
     void SetBlockImageType(int block_image_type) { this->block_image_type = block_image_type; }
     int GetBlockImageType() { return block_image_type; }
 
-    BREAK_BLOCK BreakBlock();
+    bool BreakBlock();
 };

@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BoxCollider.cpp" />
+    <ClCompile Include="FpsControll.cpp" />
     <ClCompile Include="GameMain.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="Key.cpp" />
@@ -160,6 +161,7 @@
     <ClInclude Include="AbstractScene.h" />
     <ClInclude Include="BoxCollider.h" />
     <ClInclude Include="define.h" />
+    <ClInclude Include="FpsControll.h" />
     <ClInclude Include="GameMain.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Key.h" />

@@ -8,8 +8,9 @@ StageBlock::StageBlock(int x, int y, int type)
     size = { STAGE_BLOCK_SIZE_X,STAGE_BLOCK_SIZE_Y };
     location.x = (x * size.x) + (size.x / 2);
     location.y = (y * size.y) + (size.y / 2);
-    
-    block_type = BLOCK_TYPE::NONE, item_type = ITEM_TYPE::NONE;
+    old_location_y = location.y;
+    speed_y = -2;
+    block_type = BLOCK_TYPE::NORMAL, item_type = ITEM_TYPE::NONE;
     if (type >= 12)block_type = BLOCK_TYPE::NORMAL;
     if (type >= 25)
     {
@@ -29,11 +30,27 @@ StageBlock::StageBlock(int x, int y, int type)
   
     block_image_type = type;
     if (block_type == BLOCK_TYPE::HATENA)block_image[HATENA_BLOCK_IMAGE_FIRST];
+
+    animation = FALSE;
 }
 
-void StageBlock::Update()
+void StageBlock::Update(Stage* stage)
 {
+    if (animation)//ƒuƒƒbƒN‚ð’@‚¢‚½Žž‚Ì“®‚«
+    {
+        if (speed_y >= 0)speed_y += GRAVITY * 2;
+        else speed_y += GRAVITY;
+        location.y += speed_y;
+        if (speed_y > MAX_GRAVITY)speed_y = MAX_GRAVITY;
 
+        if (location.y > old_location_y)
+        {
+            location.y = old_location_y;
+            stage->ItemGeneration(location, item_type);
+            item_type = ITEM_TYPE::NONE;
+            animation = FALSE;
+        }
+    }
 }
 
 void StageBlock::Draw(float camera_work) const
@@ -41,23 +58,20 @@ void StageBlock::Draw(float camera_work) const
     DrawRotaGraph(location.x + camera_work, location.y, 1, 0, block_image[block_image_type], TRUE, FALSE);
 }
 
-BREAK_BLOCK StageBlock::BreakBlock()
+bool StageBlock::BreakBlock()
 {
-    BREAK_BLOCK break_block = { item_type, location, FALSE };
+    bool flg = FALSE;
 
-    if ((block_type == BLOCK_TYPE::HATENA) ||
+    if ((block_type == BLOCK_TYPE::HATENA)||
         (block_type == BLOCK_TYPE::BRICK) ||
         (block_type == BLOCK_TYPE::TRANSPARENT_BLOCK))
     {
-        if (block_type == BLOCK_TYPE::BRICK)
-        {
-            if (item_type == ITEM_TYPE::NONE)break_block.can_delete = TRUE;
-        }
-
+        if ((block_type == BLOCK_TYPE::BRICK) && (item_type == ITEM_TYPE::NONE))flg = TRUE;
+       
         block_type = BLOCK_TYPE::NORMAL;
-        item_type = ITEM_TYPE::NONE;
         block_image_type = 15;
+        animation = TRUE;
     }
 
-    return break_block;
+    return flg;
 }

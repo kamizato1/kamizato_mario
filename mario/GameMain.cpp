@@ -32,6 +32,8 @@ void GameMain::Draw() const
 
     stage->Draw(camera_work);
     player->Draw(camera_work);
+
+    DrawFormatString(0, 25, 0xffffff, "%f", camera_work);
 }
 
 AbstractScene* GameMain::ChangeScene()

@@ -4,28 +4,28 @@
 
 #define IMAGE_TYPE_FIRST 3
 #define IMAGE_TYPE_LAST 4
-#define IMAGE_CHANGE_TIME 3
+#define IMAGE_CHANGE_TIME 5
 
-#define PLAYER_MAX_GRAVITY 10
-#define PLAYER_GRAVITY 0.7
-#define MAX_SPEED 4
+#define WALK_MAX_SPEED 3
+#define DASH_MAX_SPEED 5
+#define ACCELERATION 0.09
 
 Player::Player()
 {
-	location = { 20,20 };
+	location = { 3500,100 };
 	size = { 22,60 };
-	for (int i = 0; i < SPEED_DATA_NUM; i++)speed_data[i] = { 0,0 };
-    speed = {0 , PLAYER_MAX_GRAVITY};
+	//for (int i = 0; i < SPEED_DATA_NUM; i++)speed_data[i] = { 0,0 };
+    speed = {0 , 0};
 
     int image[54];
     LoadDivGraph("image/Mario/big_mario.png", 54, 9, 6, 32, 64, image);
-    int a = 0;
+    int count = 0;
     for (int i = 0; i < 6; i++)
     {
         for (int j = 0; j < 9; j++)
         {
-            this->image[i][j] = image[a];
-            a++;
+            this->image[i][j] = image[count];
+            count++;
         }
     }
 
@@ -36,11 +36,11 @@ Player::Player()
 
 void Player::Update(Key* key, Stage* stage)
 {
-    if(CheckHitKey(KEY_INPUT_RETURN))location.y = 250;
+    //if(CheckHitKey(KEY_INPUT_RETURN))location.y = 250;
 
     //x座標の移動↓
 
-    float add_speed_x = 0;
+    /*float add_speed_x = 0;
     float now_speed_x = 0;
     float old_speed_x;
     speed.x = 0;
@@ -53,10 +53,37 @@ void Player::Update(Key* key, Stage* stage)
         speed_data[i].x = now_speed_x;
         now_speed_x = old_speed_x;
         add_speed_x += speed_data[i].x;
-    }
+    }*/
 
     //speed.x = (add_speed_x / SPEED_DATA_NUM);
-    if (key->KeyPressed(A))speed.x = speed.x *= 1.5; //Aボタンが押されたら歩く速さを1.5倍にする;
+
+    if (key->KeyPressed(LEFT))
+    {
+        if (key->KeyPressed(A))
+        {
+            if ((speed.x -= ACCELERATION) < -DASH_MAX_SPEED)speed.x = -DASH_MAX_SPEED;
+        }
+        else if ((speed.x -= ACCELERATION) < -WALK_MAX_SPEED)speed.x = -WALK_MAX_SPEED;
+    }
+    else if (key->KeyPressed(RIGHT))
+    {
+        if (key->KeyPressed(A))
+        {
+            if ((speed.x += ACCELERATION) > DASH_MAX_SPEED)speed.x = DASH_MAX_SPEED;
+        }
+        else if((speed.x += ACCELERATION) > WALK_MAX_SPEED)speed.x = WALK_MAX_SPEED;
+    }
+    else
+    {
+        if (speed.x > 0)
+        {
+            if ((speed.x -= ACCELERATION) < 0)speed.x = 0;
+        }
+        else if (speed.x < 0)
+        {
+            if ((speed.x += ACCELERATION) > 0)speed.x = 0;
+        }
+    }
 
     if (speed.x > 0)direction_left = FALSE;
     else if (speed.x < 0)direction_left = TRUE;
@@ -72,11 +99,11 @@ void Player::Update(Key* key, Stage* stage)
 
     //y座標の移動↓
 
-    if(speed.y != PLAYER_MAX_GRAVITY)
-    {
-        speed.y += PLAYER_GRAVITY;
-        if (speed.y > PLAYER_MAX_GRAVITY)speed.y = PLAYER_MAX_GRAVITY;
-    }
+    if (speed.y >= 0)speed.y += GRAVITY * 2;
+    else speed.y += GRAVITY;
+
+    if (speed.y > MAX_GRAVITY)speed.y = MAX_GRAVITY;
+
     location.y += speed.y;
 
     PLAYER_HIT_STAGE player_hit_stage = stage->PlayerHitStage(this);
@@ -90,7 +117,7 @@ void Player::Update(Key* key, Stage* stage)
 
         if (sign == -1)//地面に当たっている
         {
-            if (key->KeyDown(B))speed.y = -14, image_type = 6;
+            if (key->KeyDown(B))speed.y = -9, image_type = 6;
             else
             {
                 if (speed.x == 0)image_type = 0;//マリオが止まっているとき
@@ -108,12 +135,13 @@ void Player::Update(Key* key, Stage* stage)
         else //頭に当たっているとき
         {
             stage->BreakBlock(player_hit_stage.block_num);
+            speed.y = 0;
         }
     }
 }
 
 void Player::Draw(float camera_work) const
 {
-    DrawFormatString(0, 0, 0xffffff, "%f", speed.x);
+    //DrawFormatString(0, 0, 0xffffff, "%f", speed.x);
    DrawRotaGraph(location.x + camera_work, location.y, 1, 0, image[0][image_type], TRUE, direction_left);
 }

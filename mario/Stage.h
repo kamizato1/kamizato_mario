@@ -50,5 +50,5 @@ public:
 
     PLAYER_HIT_STAGE PlayerHitStage(BoxCollider* bc);
     void BreakBlock(int block_num);
-
+    void ItemGeneration(DATA location, ITEM_TYPE type);
 };

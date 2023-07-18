@@ -2,7 +2,7 @@
 #include"Stage.h"
 
 
-#define HATENA_BLOCK_IMAGE_CHANGE_TIME 6
+#define HATENA_BLOCK_IMAGE_CHANGE_TIME 8
 
 Stage::Stage()
 {
@@ -72,6 +72,7 @@ void Stage::Update()
 				{
 					stageblock[i]->SetBlockImageType(hatena_block_image_type);
 				}
+				
 			}
 		}
 
@@ -80,7 +81,17 @@ void Stage::Update()
 		else hatena_block_image_change_time = HATENA_BLOCK_IMAGE_CHANGE_TIME;
 	}
 
-	if(item != nullptr)item->Update(this);
+	
+
+	for (int i = 0; i < STAGE_BLOCK_NUM; i++)
+	{
+		if (stageblock[i] != nullptr)
+		{
+			stageblock[i]->Update(this);
+		}
+	}
+	
+	if (item != nullptr)item->Update(this);
 }
 
 void Stage::Draw(float camera_work) const
@@ -142,9 +153,14 @@ bool Stage::HitStage(BoxCollider* bc)
 
 void Stage::BreakBlock(int block_num)
 {
-	BREAK_BLOCK break_block = stageblock[block_num]->BreakBlock();
-	if (break_block.can_delete)stageblock[block_num] = nullptr;
-	if (break_block.item_type != ITEM_TYPE::NONE)item = new Item(break_block.item_type, break_block.location);
+	if (stageblock[block_num]->BreakBlock())
+	{
+		stageblock[block_num] = nullptr;
+	}
+	//if (break_block.item_type != ITEM_TYPE::NONE)item = new Item(break_block.item_type, break_block.location);
 }
 
-
+void Stage::ItemGeneration(DATA location, ITEM_TYPE type)
+{
+	item = new Item(type,location);
+}

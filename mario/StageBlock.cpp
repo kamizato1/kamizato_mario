@@ -10,6 +10,7 @@ StageBlock::StageBlock(int x, int y, int type)
     location.y = (y * size.y) + (size.y / 2);
     old_location_y = location.y;
     speed_y = -2;
+
     block_type = BLOCK_TYPE::NORMAL, item_type = ITEM_TYPE::NONE;
     if (type >= 12)block_type = BLOCK_TYPE::NORMAL;
     if (type >= 25)

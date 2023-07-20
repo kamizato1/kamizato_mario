@@ -49,7 +49,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         sceneMng->Draw();
         
         //フレームレート表示
-        FpsControll_Draw();
+        //FpsControll_Draw();
 
         ScreenFlip();			// 裏画面の内容を表画面に反映
 

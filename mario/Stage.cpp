@@ -2,12 +2,14 @@
 #include"Stage.h"
 
 
+
 #define HATENA_BLOCK_IMAGE_CHANGE_TIME 8
 
 Stage::Stage()
 {
 	int block_image[BLOCK_TYPE_NUM];
 	LoadDivGraph("image/stage_block_2.png", BLOCK_TYPE_NUM, BLOCK_TYPE_NUM, 1, STAGE_BLOCK_SIZE_X, STAGE_BLOCK_SIZE_Y, block_image);
+	sky_image = LoadGraph("image/sky.png");
 	sky_image = LoadGraph("image/sky.png");
 	for (int i = 0; i < STAGE_BLOCK_NUM; i++)stageblock[i] = nullptr;
 	
@@ -96,9 +98,22 @@ void Stage::Update()
 
 void Stage::Draw(float camera_work) const
 {
-	DrawBackGround(camera_work);
+	DrawGraph(0, 0, sky_image, FALSE);
+	for (int i = 0; i < BACK_GROUND_NUM; i++)
+	{
+		DrawGraph(back_ground[i].location.x + camera_work, back_ground[i].location.y, back_ground[i].image, FALSE);
+	}
+	//DrawBackGround(camera_work);
 	if (item != nullptr)item->Draw(camera_work);
-	DrawStage(camera_work);
+	//DrawStage(camera_work);
+
+	for (int i = 0; i < STAGE_BLOCK_NUM; i++)
+	{
+		if (stageblock[i] != nullptr)
+		{
+			stageblock[i]->Draw(camera_work);
+		}
+	}
 }
 
 void Stage::DrawBackGround(float camera_work)const
